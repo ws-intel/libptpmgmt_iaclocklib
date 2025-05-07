@@ -75,7 +75,7 @@ ALL+=$(CLKMGR_LIB_LA) $(CLKMGR_PROXY)
 ifdef GTEST_LIB_FLAGS
 
 CLKMGR_CLIENT_UTEST:=$(CLKMGR_UTEST_DIR)/utest_client
-CLKMGR_CLIENT_SRC:=subscription client_state
+CLKMGR_CLIENT_SRC:=ut_client_state ut_connect_msg
 CLKMGR_CLIENT_OBJS:=$(foreach n,$(CLKMGR_CLIENT_SRC),$(CLKMGR_UTEST_DIR)/$n.o)
 
 $(CLKMGR_UTEST_DIR)/%.o: $(CLKMGR_UTEST_DIR)/%.cpp | $(COMP_DEPS)
@@ -83,10 +83,24 @@ $(CLKMGR_UTEST_DIR)/%.o: $(CLKMGR_UTEST_DIR)/%.cpp | $(COMP_DEPS)
 	  -include $(HAVE_GTEST_HEADER) -c -o $@ $<
 $(CLKMGR_CLIENT_UTEST): $(OBJ_DIR)/utest_m.o $(CLKMGR_CLIENT_OBJS) \
 	$(CLKMGR_LIB_A) | $(CLKMGR_LIB_LA)
-	$(Q_LD)$(CXX) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS)\
+	$(Q_LD)$(CXX) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -lrtpi\
 	  $(GTEST_LIB_FLAGS) -o $@
 utest_clkmgr_client: $(HEADERS_GEN_COMP) $(CLKMGR_CLIENT_UTEST)
 	$(call Q_UTEST,C++)$(UVGD)$(CLKMGR_CLIENT_UTEST) $(GTEST_NO_COL) $(GTEST_FILTERS)
+
+CLKMGR_PROXY_UTEST:=$(CLKMGR_UTEST_DIR)/utest_proxy
+CLKMGR_PROXY_SRC:=ut_config_parser
+CLKMGR_PROXY_OBJS:=$(foreach n,$(CLKMGR_PROXY_SRC),$(CLKMGR_UTEST_DIR)/$n.o)
+
+$(CLKMGR_UTEST_DIR)/%.o: $(CLKMGR_UTEST_DIR)/%.cpp | $(COMP_DEPS)
+	$(Q_CC)$(CXX) $(CXXFLAGS_UTEST) $(CLKMGR_CXXFLAGS) $(GTEST_INC_FLAGS)\
+	  -include $(HAVE_GTEST_HEADER) -c -o $@ $<
+$(CLKMGR_PROXY_UTEST): $(OBJ_DIR)/utest_m.o $(CLKMGR_PROXY_OBJS) \
+	$(CLKMGR_LIB_A) | $(CLKMGR_LIB_LA)
+	$(Q_LD)$(CXX) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -lrtpi\
+	  $(GTEST_LIB_FLAGS) -o $@
+utest_clkmgr_proxy: $(HEADERS_GEN_COMP) $(CLKMGR_PROXY_UTEST)
+	$(call Q_UTEST,C++)$(UVGD)$(CLKMGR_PROXY_UTEST) $(GTEST_NO_COL) $(GTEST_FILTERS)
 endif #GTEST_LIB_FLAGS
 
 define clkmgr_pkgconfig
