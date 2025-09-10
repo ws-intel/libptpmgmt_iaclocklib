@@ -98,11 +98,7 @@ start_client() {
 		{
 		  "timeBases": [{
 		    "timeBaseName": "Global Clock",
-		    "ptp4l": {
-		      "udsAddr": "/clknetsim/unix/${ptp4l_node}:1",
-		      "domainNumber": 0,
-		      "transportSpecific": 0
-		    }
+			"chrony": { "udsAddr": "/clknetsim/unix/${chrony_node}:1" }
 		  }]
 		}
 		EOF
